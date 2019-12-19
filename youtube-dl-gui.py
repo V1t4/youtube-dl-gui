@@ -5,19 +5,27 @@ from pygame.scrap import *
 
 from pgu import gui
 from misClases import *
-#from funciones import *
+import subprocess
 
-screen = pygame.display.set_mode((1100,480),SWSURFACE)
-pygame.display.set_caption("youtube-dl")
-
-app = gui.Desktop()
-app.connect(gui.QUIT, app.quit, None)
-main = gui.Container(width=1100, height=500)
+def descargar(url, name, directory, form, isVideo):
+    command = ["youtube-dl"]
+    if isVideo:
+        command.append("-f")
+    else:
+        command.append("-x")
+        command.append("--audio-format")
+    command.append(form)
+    command.append("-o")
+    fullpath = directory + '/' + name + ".%(ext)s"
+    command.append(fullpath)
+    command.append(url)
+    subprocess.call(command) 
 
 def getURL(args):
     url = pygame.scrap.get("STRING")
-    url = url.decode("ascii", "ignore")
-    inputURL.value = url
+    if url:
+        url = url.decode("ascii", "ignore")
+        inputURL.value = url
 
 def getInput(args):
     url = inputURL.value
@@ -28,6 +36,8 @@ def getInput(args):
     print(name)
     print(directory)
     print(form)
+    print(auvi.value)
+    descargar(url, name, directory, form, auvi.value)
 
 def btn_clk (arg):
     print("Clicked!")
@@ -52,6 +62,13 @@ def swt_clk(swt,sel):
     else:
         sel.append(videoSelect)
     main.add(sel[0], 370, 265)
+
+screen = pygame.display.set_mode((1100,480),SWSURFACE)
+pygame.display.set_caption("youtube-dl")
+
+app = gui.Desktop()
+app.connect(gui.QUIT, app.quit, None)
+main = gui.Container(width=1100, height=500)
 
 # URL
 main.add(gui.Label("URL:"), 20, 30)
