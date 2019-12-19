@@ -1,14 +1,33 @@
+#!/usr/bin/python3
 import pygame
 from pygame.locals import *
+from pygame.scrap import *
 
 from pgu import gui
 from misClases import *
+#from funciones import *
+
 screen = pygame.display.set_mode((1100,480),SWSURFACE)
 pygame.display.set_caption("youtube-dl")
 
 app = gui.Desktop()
 app.connect(gui.QUIT, app.quit, None)
 main = gui.Container(width=1100, height=500)
+
+def getURL(args):
+    url = pygame.scrap.get("STRING")
+    url = url.decode("ascii", "ignore")
+    inputURL.value = url
+
+def getInput(args):
+    url = inputURL.value
+    name = inputName.value
+    directory = inputDir.value
+    form = sel[0].value
+    print(url)
+    print(name)
+    print(directory)
+    print(form)
 
 def btn_clk (arg):
     print("Clicked!")
@@ -41,7 +60,7 @@ inputURL.connect("activate", input_cb)
 main.add(inputURL, 95, 30)
 bp = PasteButton()
 main.add(bp, 1030, 20)
-bp.connect(gui.CLICK, btn_clk, None)
+bp.connect(gui.CLICK, getURL, None)
 
 # Nombre
 main.add(gui.Label("Nombre:"), 20, 110)
@@ -87,6 +106,10 @@ main.add(bh, 20, 400)
 
 # Descargar
 bd = DownloadButton()
-bd.connect(gui.CLICK, btn_clk, None)
+bd.connect(gui.CLICK, getInput, None)
 main.add(bd, 800, 280)
+
+# Iniciar scrap para obtener informacion del portapapeles
+pygame.scrap.init()
+pygame.scrap.set_mode(SCRAP_CLIPBOARD)
 app.run(main)
