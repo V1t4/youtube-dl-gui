@@ -16,18 +16,24 @@ def descargar(url, name, directory, form, isVideo):
         command.append("--audio-format")
     command.append(form)
     command.append("-o")
-    fullpath = directory + '/' + name + ".%(ext)s"
+    fullpath = directory + '/' 
+    if name == defaultName:
+        fullpath += "%(title)s.%(ext)s"
+    else:
+        fullpath += name + ".%(ext)s"
     command.append(fullpath)
     command.append(url)
     subprocess.call(command) 
 
-def getURL(args):
+def getURL():
     url = pygame.scrap.get("STRING")
     if url:
         url = url.decode("ascii", "ignore")
         inputURL.value = url
 
-def getInput(args):
+def getInput():
+    if inputURL.value == '':
+        return
     url = inputURL.value
     name = inputName.value
     directory = inputDir.value
@@ -39,11 +45,24 @@ def getInput(args):
     print(auvi.value)
     descargar(url, name, directory, form, auvi.value)
 
-def btn_clk (arg):
+def saveDefaultDir():
+    dirFile = open("directorio.txt", "w")
+    dirFile.write(inputDir.value)
+    dirFile.close()
+
+def ingresarNombre():
+    if inputName.value == defaultName:
+        inputName.value = ''
+
+def dejarIngresarNombre():
+    if inputName.value == '':
+        inputName.value = defaultName
+
+def btn_clk ():
     print("Clicked!")
 
-def open_file_browser(arg):
-    d = FolderDialog()
+def open_file_browser():
+    d = FolderDialog(path = inputDir.value)
     d.connect(gui.CHANGE, handle_file_browser_closed, d)
     d.open()
 
@@ -77,25 +96,33 @@ inputURL.connect("activate", input_cb)
 main.add(inputURL, 95, 30)
 bp = PasteButton()
 main.add(bp, 1030, 20)
-bp.connect(gui.CLICK, getURL, None)
+bp.connect(gui.CLICK, getURL)
 
 # Nombre
 main.add(gui.Label("Nombre:"), 20, 110)
-inputName = gui.Input(value="(Nombre del video)", size=70)
-inputName.connect("activate", input_cb)
+defaultName = "(Ingrese el nombre del video)"
+inputName = gui.Input(value=defaultName, size=70)
+inputName.connect(gui.FOCUS, ingresarNombre)
+inputName.connect(gui.BLUR, dejarIngresarNombre)
 main.add(inputName, 140, 110)
 
 # Directorio
 main.add(gui.Label("Directorio:"), 20, 190)
 # leer input de un archivo y sobreescribirlo
-inputDir = gui.Input("(Lugar donde se va a guardar)",59)
+try:
+    dirFile = open("directorio.txt")
+    defaultDir = dirFile.readline()
+    dirFile.close()
+except FileNotFoundError:
+    defaultDir = "/home/vita/Programacion"
+inputDir = gui.Input(defaultDir, 59)
 main.add(inputDir, 160, 190)
 bo = OpenButton()
 main.add(bo, 955, 180)
-bo.connect(gui.CLICK, open_file_browser, None)
+bo.connect(gui.CLICK, open_file_browser)
 bs = SaveButton()
 main.add(bs, 1030, 180)
-bs.connect(gui.CLICK, btn_clk, None)
+bs.connect(gui.CLICK, saveDefaultDir)
 
 # Formato
 audioSelect = gui.Select(value="mp3")
@@ -118,12 +145,12 @@ main.add(sel[0], 370, 265)
 
 # Ayuda
 bh = HelpButton()
-bh.connect(gui.CLICK, btn_clk, None)
+bh.connect(gui.CLICK, btn_clk)
 main.add(bh, 20, 400)
 
 # Descargar
 bd = DownloadButton()
-bd.connect(gui.CLICK, getInput, None)
+bd.connect(gui.CLICK, getInput)
 main.add(bd, 800, 280)
 
 # Iniciar scrap para obtener informacion del portapapeles
