@@ -3,6 +3,7 @@
 from pgu import gui
 import os
 
+# Botones con iconos personalizados
 class PasteButton(gui.Button):
     def __init__(self, **params):
         params.setdefault('cls', 'pastebutton')
@@ -12,7 +13,6 @@ class OpenButton(gui.Button):
     def __init__(self, **params):
         params.setdefault('cls', 'openbutton')
         super(OpenButton, self).__init__(value="    ", **params)
-
 
 class SaveButton(gui.Button):
     def __init__(self, **params):
@@ -96,4 +96,54 @@ class FolderDialog(gui.Dialog):
             self.value = self.curdir
             self.send(gui.const.CHANGE)
             self.close()
+
+class HelpDialog(gui.Dialog):
+    '''Clase para mostrar como usar el programa.'''
+    def __init__(self,**params):
+        title = gui.Label("Ayuda")
+        
+        width = 900
+        height = 400
+        doc = gui.Document(width=width)
+        
+        space = title.style.font.size(" ")
+        
+        doc.block(align=-1)
+        doc.add(gui.Image("data/themes/default/paste_button.png"))
+        for word in "  Pegar url del video a descargar".split(" "): 
+            doc.add(gui.Label(word))
+            doc.space(space)
+        doc.br(space[1])
+        
+        doc.block(align=-1)
+        doc.add(gui.Image("data/themes/default/open_button.png"))
+        for word in """  Seleccionar el directorio donde se va a guardar""".split(" "): 
+            doc.add(gui.Label(word))
+            doc.space(space)
+        doc.br(space[1])
+        
+        doc.block(align=-1)
+        doc.add(gui.Image("data/themes/default/save_button.png"))
+        for word in """  Guardar el directorio seleccionado como predeterminado""".split(" "): 
+            doc.add(gui.Label(word))
+            doc.space(space)
+        doc.br(space[1])
+        
+        doc.block(align=-1)
+        doc.add(gui.Image("data/themes/default/audio_button.png"))
+        doc.space(space)
+        doc.add(gui.Image("data/themes/default/video_button.png"))
+        for word in """  Seleccionar formato de salida""".split(" "): 
+            doc.add(gui.Label(word))
+            doc.space(space)
+        doc.br(space[1])
+        
+        doc.block(align=-1)
+        doc.add(gui.Image("data/themes/default/download_button.png"))
+        for word in """  Descargar el video""".split(" "): 
+            doc.add(gui.Label(word))
+            doc.space(space)
+        doc.br(space[1])
+        
+        gui.Dialog.__init__(self,title,gui.ScrollArea(doc,width,height))
 
