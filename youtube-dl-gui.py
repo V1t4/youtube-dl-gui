@@ -1,21 +1,28 @@
 #!/usr/bin/python3
+from __future__ import unicode_literals
+
 import pygame
 from pygame.locals import *
 from pygame.scrap import *
 
 from pgu import gui
 from misClases import *
-import subprocess
 
-def btn_clk ():
-    print("Clicked!")
+import youtube_dl
+
+def changeStatus (new):
+    main.remove(status)
+    status.value = new
+    main.add(status, 770,400)
 
 def pasteURL():
+    changeStatus('') 
     url = pygame.scrap.get("STRING")
     if url:
         inputURL.value = url.decode("ascii", "ignore")
 
 def inputNewName():
+    changeStatus('') 
     if inputName.value == defaultName:
         inputName.value = ''
 
@@ -24,6 +31,7 @@ def leaveInputName():
         inputName.value = defaultName
 
 def openFileBrowser():
+    changeStatus('') 
     d = FolderDialog(path = inputDir.value)
     d.connect(gui.CHANGE, fileBrowserClosed, d)
     d.open()
@@ -37,6 +45,7 @@ def saveDefaultDirectory():
     dirFile.close()
 
 def changeFormatSelection(swt,sel):
+    changeStatus('') 
     main.remove(sel[0])
     sel.pop(0)
     if swt.value:
@@ -53,23 +62,25 @@ def download():
     directory = inputDir.value
     form = sel[0].value
     isVideo = auvi.value
-    command = ["youtube-dl"]
+    ydl_opts = {}
+
     if isVideo:
-        command.append("-f")
+        if form == "mkv":
+            ydl_opts["merge_output_format"] = form
+        else:
+            ydl_opts["format"] = form
     else:
-        command.append("-x")
-        command.append("--audio-format")
-    command.append(form)
-    command.append("-o")
+        ydl_opts["postprocessors"] = [{"key": "FFmpegExtractAudio",
+            "preferredcodec": form}]
     fullpath = directory + '/' 
     if name == defaultName:
         fullpath += "%(title)s.%(ext)s"
     else:
         fullpath += name + ".%(ext)s"
-    command.append(fullpath)
-    command.append(url)
-    subprocess.call(command) 
-
+    ydl_opts["outtmpl"] = fullpath
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    changeStatus("Finalizado exitosamente") 
 
 screen = pygame.display.set_mode((1100,500),SWSURFACE)
 pygame.display.set_caption("youtube-dl")
@@ -77,6 +88,8 @@ pygame.display.set_caption("youtube-dl")
 app = gui.Desktop()
 app.connect(gui.QUIT, app.quit, None)
 main = gui.Container(width=1100, height=500)
+
+status = gui.Label("")
 
 # URL
 main.add(gui.Label("URL:"), 20, 30)
@@ -119,10 +132,10 @@ audioSelect.add("m4a","m4a")
 videoSelect = gui.Select(value="mp4")
 videoSelect.add("mp4","mp4")
 videoSelect.add("mkv","mkv")
-videoSelect.add("flv","flv")
 sel = []
 sel.append(audioSelect)
-
+audioSelect.connect(gui.CLICK,changeStatus,"")
+videoSelect.connect(gui.CLICK,changeStatus,"")
 auvi = gui.Switch()
 main.add(auvi, 20, 260)
 auvi.connect(gui.CLICK, changeFormatSelection, auvi, sel)
@@ -138,9 +151,10 @@ main.add(bh, 20, 400)
 # Descargar
 bd = DownloadButton()
 bd.connect(gui.CLICK, download)
-main.add(bd, 800, 280)
+main.add(bd, 790, 280)
 
 # Iniciar scrap para obtener informacion del portapapeles
 pygame.scrap.init()
 pygame.scrap.set_mode(SCRAP_CLIPBOARD)
+main.add(status, 770,400)
 app.run(main)
