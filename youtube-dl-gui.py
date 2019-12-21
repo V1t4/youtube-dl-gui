@@ -10,41 +10,51 @@ from misClases import *
 
 import youtube_dl
 
+import os
+
 def changeStatus (new):
+    '''Show/hide download end'''
     main.remove(status)
     status.value = new
     main.add(status, 770,400)
 
 def pasteURL():
+    '''Paste URL from clipboard to url input'''
     changeStatus('') 
     url = pygame.scrap.get("STRING")
     if url:
         inputURL.value = url.decode("ascii", "ignore")
 
 def inputNewName():
+    '''Clear name input if it value is the default name'''
     changeStatus('') 
     if inputName.value == defaultName:
         inputName.value = ''
 
 def leaveInputName():
+    '''If the user didn't write nothing, change name input value to default'''
     if inputName.value == '':
         inputName.value = defaultName
 
 def openFileBrowser():
+    '''Open dialog to select folder'''
     changeStatus('') 
     d = FolderDialog(path = inputDir.value)
     d.connect(gui.CHANGE, fileBrowserClosed, d)
     d.open()
 
 def fileBrowserClosed(dlg):
+    '''When user close folder dialog, directory input value change to selection'''
     if dlg.value: inputDir.value = dlg.value
 
 def saveDefaultDirectory():
+    '''Save in a file the directory selected as default directory to download'''
     dirFile = open("directorio.txt", "w")
     dirFile.write(inputDir.value)
     dirFile.close()
 
 def changeFormatSelection(swt,sel):
+    '''Change audio/video selector'''
     changeStatus('') 
     main.remove(sel[0])
     sel.pop(0)
@@ -55,6 +65,7 @@ def changeFormatSelection(swt,sel):
     main.add(sel[0], 370, 265)
 
 def download():
+    '''Download video'''
     url = inputURL.value
     if url == '':
         return
@@ -114,7 +125,7 @@ try:
     defaultDir = dirFile.readline()
     dirFile.close()
 except FileNotFoundError:
-    defaultDir = "/home/vita/Programacion"
+    defaultDir = os.getcwd()
 inputDir = gui.Input(defaultDir, 59)
 main.add(inputDir, 160, 190)
 bo = OpenButton()
