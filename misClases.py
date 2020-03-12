@@ -29,6 +29,11 @@ class DownloadButton(gui.Button):
         params.setdefault('cls', 'downloadbutton')
         super(DownloadButton, self).__init__(value="           ", **params)
 
+class UpdateButton(gui.Button):
+    def __init__(self, **params):
+        params.setdefault('cls', 'updatebutton')
+        super(UpdateButton, self).__init__(value="    ", **params)
+
 class FolderDialog(gui.Dialog):
     def __init__(self, title_txt="Seleccione carpeta", button_txt="Abrir", cls="dialog", path=None):
         """Clase para seleccionar carpetas. Es parecida a fileDialog, 

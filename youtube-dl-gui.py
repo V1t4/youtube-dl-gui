@@ -10,6 +10,7 @@ from misClases import *
 
 import youtube_dl
 
+import update as u
 import os
 
 def changeStatus (new):
@@ -93,6 +94,13 @@ def download():
         ydl.download([url])
     changeStatus("Finalizado exitosamente") 
 
+def updateytdl():
+    '''Update youtube-dl'''
+    print("Actualizando")
+    u.update()
+    print("Listo")
+
+
 screen = pygame.display.set_mode((1100,500),SWSURFACE)
 pygame.display.set_caption("youtube-dl")
 
@@ -158,6 +166,11 @@ bh = HelpButton()
 dh = HelpDialog()
 bh.connect(gui.CLICK, dh.open)
 main.add(bh, 20, 400)
+
+# Actualizar youtube-dl
+bu = UpdateButton()
+main.add(bu, 100, 400)
+bu.connect(gui.CLICK, updateytdl)
 
 # Descargar
 bd = DownloadButton()
