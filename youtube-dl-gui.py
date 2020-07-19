@@ -21,14 +21,14 @@ def changeStatus (new):
 
 def pasteURL():
     '''Paste URL from clipboard to url input'''
-    changeStatus('') 
+    changeStatus('')
     url = pygame.scrap.get("STRING")
     if url:
         inputURL.value = url.decode("ascii", "ignore")
 
 def inputNewName():
     '''Clear name input if it value is the default name'''
-    changeStatus('') 
+    changeStatus('')
     if inputName.value == defaultName:
         inputName.value = ''
 
@@ -39,7 +39,7 @@ def leaveInputName():
 
 def openFileBrowser():
     '''Open dialog to select folder'''
-    changeStatus('') 
+    changeStatus('')
     d = FolderDialog(path = inputDir.value)
     d.connect(gui.CHANGE, fileBrowserClosed, d)
     d.open()
@@ -56,7 +56,7 @@ def saveDefaultDirectory():
 
 def changeFormatSelection(swt,sel):
     '''Change audio/video selector'''
-    changeStatus('') 
+    changeStatus('')
     main.remove(sel[0])
     sel.pop(0)
     if swt.value:
@@ -84,7 +84,7 @@ def download():
     else:
         ydl_opts["postprocessors"] = [{"key": "FFmpegExtractAudio",
             "preferredcodec": form}]
-    fullpath = directory + '/' 
+    fullpath = directory + '/'
     if name == defaultName:
         fullpath += "%(title)s.%(ext)s"
     else:
@@ -92,7 +92,7 @@ def download():
     ydl_opts["outtmpl"] = fullpath
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    changeStatus("Finalizado exitosamente") 
+    changeStatus("Finalizado exitosamente")
 
 def updateytdl():
     '''Update youtube-dl'''
